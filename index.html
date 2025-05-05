@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tovry</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body
+    class="bg-gray-950 text-white font-sans text-sm min-h-screen antialiased"
+  >
+    <div
+      class="container mx-auto max-w-screen-sm px-4 sm:px-6 lg:px-8 py-6 space-y-10"
+    >
+      <header class="text-center space-y-2">
+        <h1
+          class="text-4xl font-bold bg-gradient-to-r from-emerald-400 to-green-400 text-transparent bg-clip-text"
+        >
+          Tovry
+        </h1>
+        <p class="text-gray-400">Generate AI videos from dialog</p>
+      </header>
+
+      <div
+        id="errorMsg"
+        class="hidden bg-red-800/30 border border-red-500 text-red-400 rounded-xl px-4 py-2 text-center text-sm"
+      ></div>
+
+      <section
+        class="bg-gray-900 rounded-2xl p-5 space-y-4 shadow-2xl transition-scale"
+      >
+        <h2 class="text-emerald-400 font-semibold text-base">Upload Files</h2>
+        <div class="space-y-6">
+          <div id="dropVideo" class="drag-area">
+            <p>Drop background video here or click to select</p>
+            <input
+              id="backgroundVideo"
+              type="file"
+              accept="video/*"
+              class="hidden"
+            />
+            <p id="videoName" class="file-name"></p>
+          </div>
+          <div id="dropImage" class="drag-area">
+            <p>Drop profile image here or click to select</p>
+            <input
+              id="profileImage"
+              type="file"
+              accept="image/*"
+              class="hidden"
+              onchange="previewImage()"
+            />
+            <p id="imageName" class="file-name"></p>
+            <div id="previewContainer" class="flex justify-center mt-4 hidden">
+              <img
+                id="imagePreview"
+                class="w-32 h-32 rounded-full object-cover shadow-lg"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="bg-gray-900 rounded-2xl p-5 shadow-2xl space-y-2 transition-scale"
+      >
+        <h2 class="text-emerald-400 font-semibold text-base">Profile</h2>
+        <input
+          id="profileName"
+          type="text"
+          placeholder="Profile Name"
+          class="w-full bg-gray-800 h-9 px-3 rounded-full text-xs transition-all"
+        />
+      </section>
+
+      <section
+        class="bg-gray-900 rounded-2xl p-5 shadow-2xl space-y-4 transition-scale"
+      >
+        <h2 class="text-emerald-400 font-semibold text-base">Voices</h2>
+        <div class="grid sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-gray-300 mb-1">Voice for Me</label>
+            <select
+              id="voiceMe"
+              class="from w-full bg-gradient-to-r from-gray-800 to-gray-900 text-white text-xs rounded-full pl-4 pr-10 py-2 appearance-none focus:outline-none shadow-sm"
+            >
+              <option>en-US-AndrewNeural</option>
+              <option>en-US-AvaNeural</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-gray-300 mb-1">Voice for Them</label>
+            <select
+              id="voiceThem"
+              class="from w-full bg-gradient-to-r from-gray-800 to-gray-900 text-white text-xs rounded-full pl-4 pr-10 py-2 appearance-none focus:outline-none shadow-sm"
+            >
+              <option>en-US-AndrewNeural</option>
+              <option>en-US-AvaNeural</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="bg-gray-900 rounded-2xl p-5 shadow-2xl space-y-4 transition-scale"
+      >
+        <div class="flex justify-between items-center">
+          <h2 class="text-emerald-400 font-semibold text-base">Messages</h2>
+          <button
+            onclick="addMessage()"
+            class="bg-emerald-600 hover:bg-emerald-700 w-9 h-9 rounded-full flex items-center justify-center text-white transition-scale"
+          >
+            <svg
+              class="w-5 h-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 5v14m7-7H5"
+              />
+            </svg>
+          </button>
+        </div>
+        <div id="messages" class="space-y-3">
+          <div
+            id="noMessages"
+            class="flex justify-center items-center text-gray-400 text-sm italic"
+          >
+            No messages yet.
+          </div>
+        </div>
+      </section>
+
+      <button
+        id="submitBtn"
+        onclick="submitForm()"
+        class="btn-full bg-gradient-to-r from-emerald-500 to-green-400 hover:from-emerald-600 hover:to-green-500 text-white font-semibold py-2 text-sm rounded-full transition-all transition-scale"
+      >
+        Generate Video
+      </button>
+
+      <footer class="text-center text-xs text-gray-500 mt-10 pb-6">
+        Need sample files?
+        <a href="#" class="text-emerald-400 underline"
+          >Download from Google Drive</a
+        >
+      </footer>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

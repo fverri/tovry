@@ -1,0 +1,92 @@
+input[type="file"]::file-selector-button {
+  background-color: #059669;
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  padding: 0.4rem 1rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+select,
+select option {
+  background-color: #1f2937;
+  color: white;
+}
+progress {
+  border-radius: 9999px;
+  overflow: hidden;
+  height: 100%;
+}
+progress::-webkit-progress-bar {
+  background-color: #1f2937;
+  border-radius: 9999px;
+}
+progress::-webkit-progress-value {
+  background-color: #34d399;
+  border-radius: 9999px;
+  transition: width 0.2s ease-in-out;
+}
+progress::-moz-progress-bar {
+  background-color: #34d399;
+  border-radius: 9999px;
+}
+.fade-in {
+  animation: fadeIn 0.4s ease-in-out;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.transition-scale {
+  transition: transform 0.2s ease;
+}
+.transition-scale:hover {
+  transform: scale(1.02);
+}
+.text-shadow {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+.drag-area {
+  border: 2px dashed #4ade80;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  background-color: #1f2937;
+  transition: all 0.2s ease;
+  min-height: 6rem;
+}
+.dragover {
+  border-color: #f87171;
+}
+.valid {
+  border-color: #22c55e !important;
+}
+.invalid,
+input.invalid,
+select.invalid {
+  border-color: #ef4444 !important;
+}
+.file-name {
+  color: white;
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+input[type="text"],
+.from {
+  border: 1px solid #4b5563;
+}
+.btn-full {
+  display: block;
+  width: 100%;
+}
