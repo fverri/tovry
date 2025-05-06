@@ -2,552 +2,79 @@
 <html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
+    <title>Video Generator</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tovry</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <style>
-      /* ---------- CONTROLES NATIVOS ---------- */
-      input[type="file"]::file-selector-button {
-        background-color: #059669;
-        color: white;
-        border: none;
-        border-radius: 9999px;
-        padding: 0.4rem 1rem;
-        font-weight: 500;
-        font-size: 0.875rem;
-        cursor: pointer;
-      }
-      select,
-      select option {
-        background-color: #1f2937;
-        color: white;
-      }
-
-      /* ---------- PROGRESS BAR ---------- */
-      progress {
-        border-radius: 9999px;
-        overflow: hidden;
-        height: 100%;
-      }
-      progress::-webkit-progress-bar {
-        background-color: #1f2937;
-        border-radius: 9999px;
-      }
-      progress::-webkit-progress-value {
-        background-color: #34d399;
-        border-radius: 9999px;
-        transition: width 0.2s ease-in-out;
-      }
-      progress::-moz-progress-bar {
-        background-color: #34d399;
-        border-radius: 9999px;
-      }
-
-      /* ---------- ANIMACIONES ---------- */
-      .fade-in {
-        animation: fadeIn 0.4s ease-in-out;
-      }
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(8px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-      .transition-scale {
-        transition: transform 0.2s ease;
-      }
-      .transition-scale:hover {
-        transform: scale(1.02);
-      }
-      .text-shadow {
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-      }
-
-      /* ---------- DRAG & DROP ---------- */
-      .drag-area {
-        border: 2px dashed #4ade80;
-        border-radius: 1rem;
-        padding: 1.5rem;
-        text-align: center;
-        cursor: pointer;
-        background-color: #1f2937;
-        transition: all 0.2s ease;
-        min-height: 6rem;
-      }
-      .dragover {
-        border-color: #f87171;
-      }
-
-      /* ---------- VALIDACIÓN ---------- */
-      .valid {
-        border-color: #22c55e !important;
-      }
-      .invalid,
-      input.invalid,
-      select.invalid {
-        border-color: #ef4444 !important;
-      }
-
-      /* ---------- UTILIDADES ---------- */
-      .file-name {
-        color: white;
-        font-size: 0.75rem;
-        margin-top: 0.5rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-      input[type="text"],
-      .from {
-        border: 1px solid #4b5563;
-      }
-      .btn-full {
-        display: block;
-        width: 100%;
-      }
-    </style>
   </head>
-  <body
-    class="bg-gray-950 text-white font-sans text-sm min-h-screen antialiased"
-  >
-    <div
-      class="container mx-auto max-w-screen-sm px-4 sm:px-6 lg:px-8 py-6 space-y-10"
-    >
-      <header class="text-center space-y-2">
-        <h1
-          class="text-4xl font-bold bg-gradient-to-r from-emerald-400 to-green-400 text-transparent bg-clip-text"
-        >
-          Tovry
-        </h1>
-        <p class="text-gray-400">Generate AI videos from dialog</p>
-      </header>
+  <body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4">
+    <h1 class="text-3xl font-bold mb-6">Upload Files to Generate Video</h1>
 
-      <div
-        id="errorMsg"
-        class="hidden bg-red-800/30 border border-red-500 text-red-400 rounded-xl px-4 py-2 text-center text-sm"
-      ></div>
-
-      <!-- ======================= UPLOAD ======================= -->
-      <section
-        class="bg-gray-900 rounded-2xl p-5 space-y-4 shadow-2xl transition-scale"
-      >
-        <h2 class="text-emerald-400 font-semibold text-base">Upload Files</h2>
-        <div class="space-y-6">
-          <div id="dropVideo" class="drag-area">
-            <p>Drop background video here or click to select</p>
-            <input
-              id="backgroundVideo"
-              type="file"
-              accept="video/*"
-              class="hidden"
-            />
-            <p id="videoName" class="file-name"></p>
-          </div>
-          <div id="dropImage" class="drag-area">
-            <p>Drop profile image here or click to select</p>
-            <input
-              id="profileImage"
-              type="file"
-              accept="image/*"
-              class="hidden"
-              onchange="previewImage()"
-            />
-            <p id="imageName" class="file-name"></p>
-            <div id="previewContainer" class="flex justify-center mt-4 hidden">
-              <img
-                id="imagePreview"
-                class="w-32 h-32 rounded-full object-cover shadow-lg"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ======================= PROFILE ======================= -->
-      <section
-        class="bg-gray-900 rounded-2xl p-5 shadow-2xl space-y-2 transition-scale"
-      >
-        <h2 class="text-emerald-400 font-semibold text-base">Profile</h2>
-        <input
-          id="profileName"
-          type="text"
-          placeholder="Profile Name"
-          class="w-full bg-gray-800 h-9 px-3 rounded-full text-xs transition-all"
-        />
-      </section>
-
-      <!-- ======================= VOICES ======================= -->
-      <section
-        class="bg-gray-900 rounded-2xl p-5 shadow-2xl space-y-4 transition-scale"
-      >
-        <h2 class="text-emerald-400 font-semibold text-base">Voices</h2>
-        <div class="grid sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-gray-300 mb-1">Voice for Me</label>
-            <div class="relative">
-              <select
-                id="voiceMe"
-                class="from w-full bg-gradient-to-r from-gray-800 to-gray-900 text-white text-xs rounded-full pl-4 pr-10 py-2 appearance-none focus:outline-none shadow-sm"
-              >
-                <option>en-US-AndrewNeural</option>
-                <option>en-US-AvaNeural</option>
-              </select>
-              <div
-                class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-emerald-400"
-              >
-                <svg
-                  class="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M8 10l4 4 4-4"
-                  />
-                </svg>
-              </div>
-            </div>
-          </div>
-          <div>
-            <label class="block text-gray-300 mb-1">Voice for Them</label>
-            <div class="relative">
-              <select
-                id="voiceThem"
-                class="from w-full bg-gradient-to-r from-gray-800 to-gray-900 text-white text-xs rounded-full pl-4 pr-10 py-2 appearance-none focus:outline-none shadow-sm"
-              >
-                <option>en-US-AndrewNeural</option>
-                <option>en-US-AvaNeural</option>
-              </select>
-              <div
-                class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-emerald-400"
-              >
-                <svg
-                  class="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M8 10l4 4 4-4"
-                  />
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ======================= MESSAGES ======================= -->
-      <section
-        class="bg-gray-900 rounded-2xl p-5 shadow-2xl space-y-4 transition-scale"
-      >
-        <div class="flex justify-between items-center">
-          <h2 class="text-emerald-400 font-semibold text-base">Messages</h2>
-          <button
-            onclick="addMessage()"
-            class="bg-emerald-600 hover:bg-emerald-700 w-9 h-9 rounded-full flex items-center justify-center text-white transition-scale"
-            title="Add Message"
-          >
-            <svg
-              class="w-5 h-5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12 5v14m7-7H5"
-              />
-            </svg>
-          </button>
-        </div>
-        <div id="messages" class="space-y-3"></div>
-      </section>
-
-      <!-- ======================= PROGRESS ======================= -->
-      <div class="space-y-2 transition-scale">
-        <div id="progressLabel" class="text-gray-400 text-xs">
-          Waiting to start...
-        </div>
-        <div
-          class="h-5 w-full relative bg-gray-800 rounded-full overflow-hidden border border-emerald-700 shadow-inner"
-        >
-          <progress
-            id="progressBar"
-            value="0"
-            max="100"
-            class="w-full h-full appearance-none z-10 relative rounded-full transition-all duration-200 ease-in-out"
-          ></progress>
-          <div
-            id="progressText"
-            class="absolute inset-0 flex items-center justify-center text-white text-xs font-semibold z-20 text-shadow"
-          >
-            0%
-          </div>
-        </div>
-      </div>
-
-      <!-- ======================= SUBMIT ======================= -->
-      <button
-        id="submitBtn"
-        onclick="submitForm()"
-        class="btn-full bg-gradient-to-r from-emerald-500 to-green-400 hover:from-emerald-600 hover:to-green-500 text-white font-semibold py-2 text-sm rounded-full transition-all transition-scale"
-      >
+    <form id="upload-form" class="w-full max-w-md space-y-4">
+      <input type="file" name="configuration" accept=".json" required class="block w-full bg-gray-800 p-2 rounded" />
+      <input type="file" name="profile_image" accept="image/*" required class="block w-full bg-gray-800 p-2 rounded" />
+      <input type="file" name="background_video" accept="video/*" required class="block w-full bg-gray-800 p-2 rounded" />
+      <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full">
         Generate Video
       </button>
+    </form>
 
-      <!-- ======================= FINAL VIDEO ======================= -->
-      <div id="finalWrap" class="space-y-4 mt-10">
-        <div id="finalVideoContainer" class="space-y-4"></div>
-        <a
-          id="downloadBtn"
-          href="#"
-          download="video.mp4"
-          class="hidden btn-full bg-gradient-to-r from-emerald-500 to-green-400 hover:from-emerald-600 hover:to-green-500 text-white font-semibold py-2 text-sm rounded-full transition-all transition-scale text-center"
-        >
-          Download Video
-        </a>
-      </div>
-
-      <footer class="text-center text-xs text-gray-500 mt-10 pb-6">
-        Need sample files?
-        <a href="#" class="text-emerald-400 underline"
-          >Download from Google Drive</a
-        >
-      </footer>
+    <div class="w-full max-w-md mt-6">
+      <div class="text-sm mb-1">Upload Progress</div>
+      <progress id="uploadProgress" value="0" max="100" class="w-full h-4 rounded"></progress>
+      <div class="text-sm mt-4 mb-1">Download Progress</div>
+      <progress id="downloadProgress" value="0" max="100" class="w-full h-4 rounded"></progress>
     </div>
 
-    <!-- ========================================================= -->
-    <!-- =========================  JS  ========================== -->
-    <!-- ========================================================= -->
     <script>
-      /* ---------- PREVIEW ---------- */
-      function previewImage() {
-        const file = document.getElementById("profileImage").files[0];
-        const preview = document.getElementById("imagePreview");
-        const container = document.getElementById("previewContainer");
-        if (file) {
-          preview.src = URL.createObjectURL(file);
-          container.classList.remove("hidden");
-        }
-      }
+      const form = document.getElementById('upload-form');
+      const uploadProgress = document.getElementById('uploadProgress');
+      const downloadProgress = document.getElementById('downloadProgress');
 
-      /* ---------- MESSAGES ---------- */
-      function addMessage() {
-        const div = document.createElement("div");
-        div.className =
-          "flex items-center gap-2 bg-gray-800 border border-gray-700 p-3 rounded-xl fade-in";
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        uploadProgress.value = 0;
+        downloadProgress.value = 0;
 
-        /* Select idéntico al de Voices (mismo gradiente y flecha) */
-        div.innerHTML = `
-          <div class="relative w-36">
-            <select class="from w-full bg-gradient-to-r from-gray-800 to-gray-900 text-white text-xs rounded-full pl-4 pr-10 py-2 appearance-none focus:outline-none shadow-sm">
-              <option value="me">Me</option>
-              <option value="them">Them</option>
-            </select>
-            <div class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-emerald-400">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10l4 4 4-4"/>
-              </svg>
-            </div>
-          </div>
-          <input type="text" placeholder="Message..." class="text flex-1 bg-gray-900 h-8 px-3 rounded-full text-xs transition-all" />
-          <button class="remove bg-emerald-600 hover:bg-emerald-500 w-7 h-7 rounded-full flex items-center justify-center text-white" title="Remove">
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-          </button>`;
-
-        div.querySelector(".remove").onclick = () => div.remove();
-        document.getElementById("messages").appendChild(div);
-      }
-
-      new Sortable(document.getElementById("messages"), {
-        animation: 150,
-        ghostClass: "opacity-40",
-      });
-
-      /* ---------- DRAG & DROP ---------- */
-      function setupDragAndDrop(dropId, inputId, labelId) {
-        const drop = document.getElementById(dropId);
-        const input = document.getElementById(inputId);
-        const label = document.getElementById(labelId);
-
-        drop.addEventListener("click", () => input.click());
-        drop.addEventListener("dragover", (e) => {
-          e.preventDefault();
-          drop.classList.add("dragover");
-        });
-        drop.addEventListener("dragleave", () =>
-          drop.classList.remove("dragover")
-        );
-        drop.addEventListener("drop", (e) => {
-          e.preventDefault();
-          drop.classList.remove("dragover");
-          input.files = e.dataTransfer.files;
-          if (input.files[0]) {
-            label.textContent = input.files[0].name;
-            drop.classList.add("valid");
-            drop.classList.remove("invalid");
-          }
-        });
-        input.addEventListener("change", () => {
-          if (input.files[0]) {
-            label.textContent = input.files[0].name;
-            drop.classList.add("valid");
-            drop.classList.remove("invalid");
-          }
-        });
-      }
-      setupDragAndDrop("dropVideo", "backgroundVideo", "videoName");
-      setupDragAndDrop("dropImage", "profileImage", "imageName");
-
-      /* ---------- SUBMIT ---------- */
-      function submitForm() {
-        const dropVideo = document.getElementById("dropVideo");
-        const dropImage = document.getElementById("dropImage");
-        const videoFile = document.getElementById("backgroundVideo").files[0];
-        const imageFile = document.getElementById("profileImage").files[0];
-        const nameInput = document.getElementById("profileName");
-        const errorMsg = document.getElementById("errorMsg");
-        const messageEls = Array.from(
-          document.querySelectorAll("#messages .text")
-        );
-        const finalV = document.getElementById("finalVideoContainer");
-        const downloadBtn = document.getElementById("downloadBtn");
-
-        downloadBtn.classList.add("hidden");
-        [dropVideo, dropImage].forEach((el) => el.classList.remove("invalid"));
-        nameInput.classList.remove("invalid");
-        messageEls.forEach((inp) => inp.classList.remove("invalid"));
-
-        let valid = true;
-        if (!videoFile) {
-          dropVideo.classList.add("invalid");
-          valid = false;
-        }
-        if (!imageFile) {
-          dropImage.classList.add("invalid");
-          valid = false;
-        }
-        if (!nameInput.value.trim()) {
-          nameInput.classList.add("invalid");
-          valid = false;
-        }
-        if (messageEls.length === 0) valid = false;
-        messageEls.forEach((inp) => {
-          if (!inp.value.trim()) {
-            inp.classList.add("invalid");
-            valid = false;
-          }
-        });
-
-        if (!valid) {
-          errorMsg.textContent =
-            "Please complete all fields and add at least one valid message.";
-          errorMsg.classList.remove("hidden");
-          return;
-        }
-        errorMsg.classList.add("hidden");
-
-        const voiceMe = document.getElementById("voiceMe").value;
-        const voiceThem = document.getElementById("voiceThem").value;
-        const msgs = messageEls
-          .filter((i) => i.value.trim())
-          .map((i) => ({
-            from: i.parentElement.querySelector(".from").value,
-            text: i.value.trim(),
-          }));
-
-        const configBlob = new Blob(
-          [
-            JSON.stringify({
-              profile_name: nameInput.value.trim(),
-              voices: { me: voiceMe, them: voiceThem },
-              messages: msgs,
-            }),
-          ],
-          { type: "application/json" }
-        );
-
-        const formData = new FormData();
-        formData.append("configuration", configBlob, "configuration.json");
-        formData.append("profile_image", imageFile);
-        formData.append("background_video", videoFile);
+        const formData = new FormData(form);
 
         const xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://46.4.68.143:8000/upload/", true);
-        xhr.responseType = "blob";
+        xhr.open('POST', 'http://46.4.68.143:8000/upload/', true);
+        xhr.responseType = 'blob';
 
-        const bar = document.getElementById("progressBar");
-        const label = document.getElementById("progressLabel");
-        const text = document.getElementById("progressText");
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            uploadProgress.value = (event.loaded / event.total) * 100;
+          }
+        };
 
-        label.textContent = "Uploading files...";
-        let displayed = 0,
-          interval;
-        xhr.upload.onprogress = (e) => {
-          if (e.lengthComputable) {
-            const actual = Math.round((e.loaded / e.total) * 100);
-            clearInterval(interval);
-            interval = setInterval(() => {
-              if (displayed < actual) {
-                displayed++;
-                bar.value = displayed;
-                text.textContent =
-                  displayed < 100 ? displayed + "%" : "Waiting...";
-              } else clearInterval(interval);
-            }, 10);
+        xhr.onprogress = (event) => {
+          if (event.lengthComputable) {
+            downloadProgress.value = (event.loaded / event.total) * 100;
           }
         };
 
         xhr.onload = () => {
           if (xhr.status === 200) {
-            label.textContent = "Upload complete! Processing on server...";
-            text.textContent = "Waiting...";
-            bar.value = 100;
-
-            setTimeout(() => {
-              label.textContent = "Processing complete!";
-              text.textContent = "Done!";
-              finalV.innerHTML = "";
-              const vid = document.createElement("video");
-              vid.src = URL.createObjectURL(xhr.response);
-              vid.controls = true;
-              vid.className = "w-full rounded-xl shadow-lg";
-              vid.controlsList = "nodownload";
-              finalV.appendChild(vid);
-
-              downloadBtn.href = vid.src;
-              downloadBtn.classList.remove("hidden");
-            }, 1000);
+            const blob = xhr.response;
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'output_video.mp4';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
           } else {
-            label.textContent = "Error during upload.";
-            text.textContent = "Error!";
-            bar.value = 0;
+            alert('Error: ' + xhr.status);
           }
         };
 
         xhr.onerror = () => {
-          label.textContent = "Network error.";
-          text.textContent = "Failed!";
+          alert('Error uploading or downloading the file.');
         };
 
         xhr.send(formData);
-      }
+      });
     </script>
   </body>
 </html>
